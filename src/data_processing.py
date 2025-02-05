@@ -1,5 +1,7 @@
 from typing import List, Tuple, Dict
 import matplotlib.pyplot as plt
+#import matplotlib
+#matplotlib.use("TkAgg") 
 import torch
 import torch.nn.functional as F
 
@@ -26,12 +28,15 @@ def load_and_preprocess_data(
     Returns:
         List[Tuple[str, str]]. A list of bigrams, where each bigram is a tuple of two characters.
     """
+    bigrams: List[Tuple[str, str]] = []
     with open(filepath, "r") as file:
         lines: List[str] = file.read().splitlines()
-
-    # TODO
-    bigrams: List[Tuple[str, str]] = None
-
+    lista_auxiliar = [" ".join(word.lower().split(sep=" ")[0:-2]) for word in lines]
+    lista_auxiliar_2 = [start_token + " " + word + " " + end_token for word in lista_auxiliar]
+    for frase in lista_auxiliar_2:
+        frase_2 = frase.replace(" ","")
+        for i in range(len(frase_2)-1):  
+            bigrams.append((frase_2[i],frase_2[(i+1)]))
     return bigrams
 
 
@@ -49,8 +54,11 @@ def char_to_index(alphabet: str, start_token: str, end_token: str) -> Dict[str, 
     """
     # Create a dictionary with start token at the beginning and end token at the end
     # TODO
-    char_to_idx: Dict[str, int] = None
-
+    char_to_idx: Dict[str, int] = {}
+    new_alphabet = start_token+alphabet+end_token
+    new_alphabet = new_alphabet.replace(" ","")
+    for i in range(len(new_alphabet)):
+        char_to_idx[new_alphabet[i]] = i 
     return char_to_idx
 
 
@@ -66,8 +74,9 @@ def index_to_char(char_to_index: Dict[str, int]) -> Dict[int, str]:
     """
     # Reverse the char_to_index mapping
     # TODO
-    idx_to_char: Dict[int, str] = None
-
+    idx_to_char: Dict[int, str] = {}
+    for character,numero in char_to_index.items(): 
+        idx_to_char[numero] = character
     return idx_to_char
 
 
@@ -92,12 +101,16 @@ def count_bigrams(
     """
 
     # Initialize a 2D tensor for counting bigrams
-    # TODO
-    bigram_counts: torch.Tensor = None
+
+    bigram_counts: torch.Tensor = torch.zeros((len(char_to_idx),len(char_to_idx)))
 
     # Iterate over each bigram and update the count in the tensor
-    # TODO
-
+    for bi in bigrams:
+        for p in range(len(bi)-1):
+            if bi[p] in char_to_idx.keys() and bi[p+1] in char_to_idx.keys():  
+                row = char_to_idx[bi[p]]
+                col = char_to_idx[bi[p+1]]
+                bigram_counts[row,col] += 1 
     return bigram_counts
 
 

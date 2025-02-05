@@ -34,9 +34,7 @@ if __name__ == "__main__":
     print("Generated Names:")
     names = []
     for _ in range(num_names_to_generate):
-        new_name = generate_name(
-            start_token, end_token, char_to_idx, idx_to_char, bigram_probabilities
-        )
+        new_name = generate_name(start_token, end_token, char_to_idx, idx_to_char, bigram_probabilities)
         neg_log_likelihood = -calculate_log_likelihood(
             new_name, bigram_probabilities, char_to_idx, start_token, end_token
         )
